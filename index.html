@@ -4,29 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#CC2936">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Magyar Diák">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="manifest" href="./manifest.json">
 <title>Magyar Diák</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;overflow:hidden;}
-  #root{height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  html{height:100%;height:-webkit-fill-available;}
+  body{min-height:100vh;min-height:-webkit-fill-available;background:#F8F7F5;}
+  #root{height:100%;}
 </style>
-
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#CC2936">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Magyar Diák">
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
-}
-</script>
-
-<link rel="apple-touch-icon" href="./icon-192.png">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 <body>
 <div id="root"></div>
@@ -2866,7 +2856,7 @@ const QUIZZES = {
 
 
 
-window.MagyarDiakApp = function MagyarDiak() {
+window.__App = function MagyarDiak() {
 
   // ── Persisted state ──────────────────────────────────────────
   const [themeKey,       setThemeKey]       = useState('piros');
@@ -2936,6 +2926,7 @@ window.MagyarDiakApp = function MagyarDiak() {
       if (saved.userQuestions)  setUserQuestions(saved.userQuestions);
       if (saved.userSentences)  setUserSentences(saved.userSentences);
       if (saved.userVocabulary) setUserVocabulary(saved.userVocabulary);
+      if (saved.practiceTab)    setPracticeTab(saved.practiceTab);
       if (saved.srsCards)       setSrsCards(saved.srsCards);
       if (saved.customChapters) setCustomChapters(saved.customChapters);
       if (saved.editedChapters) setEditedChapters(saved.editedChapters);
@@ -2946,8 +2937,8 @@ window.MagyarDiakApp = function MagyarDiak() {
 
   // ── Persistence: auto-save ────────────────────────────────────
   useEffect(() => {
-    persist.save({ themeKey, hapticEnabled, profile, userQuestions, userSentences, userVocabulary, srsCards, customChapters, editedChapters });
-  }, [themeKey, hapticEnabled, profile, userQuestions, srsCards, customChapters, editedChapters]);
+    persist.save({ themeKey, hapticEnabled, profile, userQuestions, userSentences, userVocabulary, srsCards, customChapters, editedChapters, practiceTab });
+  }, [themeKey, hapticEnabled, profile, userQuestions, userSentences, userVocabulary, srsCards, customChapters, editedChapters, practiceTab]);
 
   // ── Full curriculum (built-in + user edits + custom) ─────────
   const fullCurriculum = useMemo(() => {
@@ -4845,7 +4836,7 @@ window.MagyarDiakApp = function MagyarDiak() {
   );
 
   const BottomNav = () => (
-    <nav style={{position:'fixed',bottom:0,left:0,right:0,background:T.surface,borderTop:`1px solid ${T.border}`,display:'flex',zIndex:100,height:58,paddingBottom:'env(safe-area-inset-bottom,0)'}}
+    <nav style={{position:'fixed',bottom:0,left:0,right:0,background:T.surface,borderTop:`1px solid ${T.border}`,display:'flex',zIndex:100,height:'calc(58px + env(safe-area-inset-bottom, 0px))',paddingBottom:'env(safe-area-inset-bottom, 0px)'}}
       aria-label="Main navigation">
       {NAV.map(item => (
         <button key={item.id} onClick={() => { HAPTIC.light(); goView(item.id); }}
@@ -4862,10 +4853,16 @@ window.MagyarDiakApp = function MagyarDiak() {
   //  RENDER
   // ══════════════════════════════════════════════════════════════
   return (
-    <div style={{minHeight:'100vh',background:T.bg,color:T.text,fontFamily:"'DM Sans','Inter',system-ui,sans-serif",transition:'background .25s,color .25s',paddingBottom:58}}>
+    <div style={{minHeight:'100vh',background:T.bg,color:T.text,fontFamily:"'DM Sans','Inter',system-ui,sans-serif",transition:'background .25s,color .25s',paddingBottom:'calc(58px + env(safe-area-inset-bottom, 0px))'}}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+        html{height:100%;height:-webkit-fill-available;}
+        body{min-height:100vh;min-height:-webkit-fill-available;}
+        /* iOS safe area support */
+        @supports(padding:max(0px)){
+          body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);}
+        }
         @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes toastUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
         .page-enter{animation:fadeUp .2s ease both;}
@@ -4880,7 +4877,7 @@ window.MagyarDiakApp = function MagyarDiak() {
       <SearchOverlay/>
 
       {/* Header */}
-      <header style={{background:T.surface,borderBottom:`1px solid ${T.border}`,padding:'0 14px',height:52,display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:100,boxShadow:T.shadow}}
+      <header style={{background:T.surface,borderBottom:`1px solid ${T.border}`,padding:'env(safe-area-inset-top, 0px) 14px 0',minHeight:52,display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:100,boxShadow:T.shadow}}
         role="banner">
         <button onClick={() => { HAPTIC.light(); goView('home'); }}
           style={{display:'flex',alignItems:'center',gap:8,background:'none',border:'none',cursor:'pointer',padding:0}}
@@ -4920,8 +4917,14 @@ window.MagyarDiakApp = function MagyarDiak() {
   );
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(React.createElement(window.MagyarDiakApp));
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(window.__App));
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
