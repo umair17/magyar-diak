@@ -202,7 +202,7 @@ When a new version of `index.html` is available:
 
 ## Curriculum Sources
 
-Content is based on *Core Concepts of Hungarian Language* by László Ragoncsa, extended with certified CEFR-aligned material from:
+Content is based on certified CEFR-aligned material from:
 
 - The Hungarian KER (Közös Európai Referenciakeret) framework
 - Hungaricum curriculum guidelines
