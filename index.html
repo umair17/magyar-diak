@@ -2,7 +2,7 @@
 <html lang="hu">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#CC2936">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,10 +12,10 @@
 <link rel="manifest" href="./manifest.json">
 <title>Magyar Diák</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html{height:100%;height:-webkit-fill-available;}
-  body{min-height:100vh;min-height:-webkit-fill-available;background:#F8F7F5;}
-  #root{height:100%;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{height:100%;height:-webkit-fill-available;}
+body{min-height:100vh;min-height:-webkit-fill-available;background:#F8F7F5;}
+#root{height:100%;}
 </style>
 </head>
 <body>
@@ -24,7 +24,7 @@
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script type="text/babel" data-presets="react">
-const { useState, useEffect, useMemo, useCallback, useRef } = React;
+const{useState,useEffect,useMemo,useCallback,useRef}=React;
 
 
 // ═══════════════════════════════════════════════════════════════
@@ -113,7 +113,7 @@ const SPEECH = {
 // ═══════════════════════════════════════════════════════════════
 //  SEARCH ENGINE — index all content for instant search
 // ═══════════════════════════════════════════════════════════════
-const buildSearchIndex = (curriculum) => {
+const buildSearchIndex = (curriculum, userSentences=[], userVocabulary=[], userQuestions=[]) => {
   const index = [];
   curriculum.forEach(level => {
     level.chapters.forEach(ch => {
@@ -136,6 +136,24 @@ const buildSearchIndex = (curriculum) => {
         }
       });
     });
+  });
+  // User sentences
+  userSentences.forEach((s,i) => {
+    index.push({ type:'user-sentence', level:s.level||'A1', chapId:'', chapTitle:'My Sentences',
+      secIdx:0, hu:s.hu, en:s.en, note:s.notes||'',
+      text:(s.hu+' '+s.en+' '+(s.tags||'')+' '+(s.notes||'')).toLowerCase() });
+  });
+  // User vocabulary
+  userVocabulary.forEach((v,i) => {
+    index.push({ type:'user-vocab', level:v.level||'A1', chapId:'', chapTitle:'My Vocabulary',
+      secIdx:0, hu:v.hu, en:v.en, note:v.notes||'',
+      text:(v.hu+' '+v.en+' '+(v.pos||'')+' '+(v.notes||'')).toLowerCase() });
+  });
+  // User quiz questions
+  userQuestions.forEach((q,i) => {
+    index.push({ type:'user-quiz', level:q.level||'A1', chapId:'', chapTitle:'My Quiz Questions',
+      secIdx:0, hu:q.hungarian||'', en:q.translation||'', note:'',
+      text:(q.hungarian+' '+q.translation+' '+(q.explain||'')).toLowerCase() });
   });
   return index;
 };
@@ -215,6 +233,7 @@ const THEMES = {
   piros: { name:"Piros", bg:"#F8F7F5", surface:"#FFFFFF", surfaceAlt:"#F3F2F0", border:"#E2DFD9", borderStrong:"#C8C4BC", text:"#1A1816", textSub:"#3D3A37", muted:"#6B6460", accent:"#CC2936", accentHover:"#B01F2B", accentSoft:"#FDF0F1", accentText:"#FFFFFF", success:"#1F6B3A", successBg:"#E8F5EE", successText:"#1A5C35", warning:"#92400E", warningBg:"#FEF3C7", shadow:"0 1px 3px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.04)", shadowMd:"0 4px 12px rgba(0,0,0,0.09)" },
   feher: { name:"Fehér", bg:"#FFFFFF", surface:"#FFFFFF", surfaceAlt:"#F5F5F5", border:"#E2E2E2", borderStrong:"#C4C4C4", text:"#0D0D0D", textSub:"#2D2D2D", muted:"#5A5A5A", accent:"#1A3A6B", accentHover:"#122B52", accentSoft:"#EEF3FB", accentText:"#FFFFFF", success:"#1F6B3A", successBg:"#E8F5EE", successText:"#1A5C35", warning:"#92400E", warningBg:"#FEF3C7", shadow:"0 1px 3px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.04)", shadowMd:"0 4px 12px rgba(0,0,0,0.10)" },
   zold:  { name:"Zöld",  bg:"#F7F8F6", surface:"#FFFFFF", surfaceAlt:"#EEF2EB", border:"#DDE4D8", borderStrong:"#C4D0BC", text:"#161A14", textSub:"#363D33", muted:"#5C6458", accent:"#2E5E3C", accentHover:"#234930", accentSoft:"#E8F2EC", accentText:"#FFFFFF", success:"#1F6B3A", successBg:"#E8F5EE", successText:"#1A5C35", warning:"#92400E", warningBg:"#FEF3C7", shadow:"0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04)", shadowMd:"0 4px 12px rgba(0,0,0,0.08)" },
+  sotet: { name:"Sötét", bg:"#111214", surface:"#1C1E22", surfaceAlt:"#24272C", border:"#2E3138", borderStrong:"#3D4149", text:"#E8EAED", textSub:"#B0B5BE", muted:"#6C7280", accent:"#CC2936", accentHover:"#B01F2B", accentSoft:"#2A1215", accentText:"#FFFFFF", success:"#3DAA68", successBg:"#0C2018", successText:"#5CC98A", warning:"#E6A817", warningBg:"#1C1404", shadow:"0 1px 3px rgba(0,0,0,0.5)", shadowMd:"0 4px 20px rgba(0,0,0,0.6)" },
   arany: { name:"Arany", bg:"#0F0D08", surface:"#1C1A12", surfaceAlt:"#252210", border:"#332F1E", borderStrong:"#4A4428", text:"#F2E8C8", textSub:"#D4C89A", muted:"#B8A882", accent:"#C8941A", accentHover:"#D9A420", accentSoft:"#2A2210", accentText:"#0F0D08", success:"#4BAF72", successBg:"#0D2418", successText:"#6DD48E", warning:"#F5B731", warningBg:"#1C1508", shadow:"0 1px 3px rgba(0,0,0,0.4),0 1px 2px rgba(0,0,0,0.3)", shadowMd:"0 4px 20px rgba(0,0,0,0.5)" },
 };
 
@@ -252,11 +271,11 @@ const SpeakBtn = ({text,T}) => {
 //  SECTION RENDERERS — pure, modular, each takes (sec, T, props)
 // ═══════════════════════════════════════════════════════════════
 
-function ConceptSection({sec, T}) {
+function ConceptSection({sec, T, TS=null}) {
   return (
     <div>
       <h3 style={{fontSize:17,fontWeight:600,marginBottom:14,color:T.text,letterSpacing:"-0.01em"}}>{sec.title}</h3>
-      <div style={{fontSize:14.5,lineHeight:1.85,color:T.textSub}}>
+      <div style={{fontSize:TS?.body||14.5,lineHeight:1.85,color:T.textSub}}>
         {(() => {
           const bodyLines = (sec.body||'').split('\n');
           const out = [];
@@ -274,7 +293,7 @@ function ConceptSection({sec, T}) {
                       borderBottom:ri<tRows.length-1 ? `1px solid ${T.border}` : 'none',
                       fontWeight:row.isHdr ? 600 : 400,
                       color:row.isHdr ? T.accent : T.textSub,
-                      wordBreak:'break-word',
+                      wordBreak:'break-word', overflowWrap:'anywhere', minWidth:0, overflow:'hidden',
                     }}>{c.trim()}</div>
                   )))}
                 </div>
@@ -309,7 +328,7 @@ function ConceptSection({sec, T}) {
   );
 }
 
-function ExampleSection({sec, T}) {
+function ExampleSection({sec, T, TS=null}) {
   return (
     <div>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
@@ -437,35 +456,88 @@ function ExerciseTF({sec,ei,T,exAns,exShow,doTF}) {
 }
 
 function ExerciseMatch({sec,T,matchSt,setMatchSt}) {
+  const pairs = sec.pairs || [];
+  const allDone = matchSt.matched.length === pairs.length && pairs.length > 0;
+  const allCorrect = allDone && matchSt.matched.every(m=>m.correct);
+  const bStyle = (matched, active, isHu) => ({
+    width:'100%', padding:'9px 10px', borderRadius:8, textAlign:'left',
+    cursor:'pointer', fontSize:13, lineHeight:1.4,
+    fontWeight: isHu ? 600 : 400, fontFamily: isHu ? 'Georgia,serif' : 'inherit',
+    border:`1.5px solid ${active?T.accent:matched?(matched.correct?T.success:T.accent):T.border}`,
+    background: matched?(matched.correct?T.successBg:T.accentSoft):active?T.accentSoft:T.surface,
+    color: matched?(matched.correct?T.successText:T.accent):active?T.accent:T.text,
+    wordBreak:'break-word', overflowWrap:'anywhere', minWidth:0,
+  });
   return (
     <div style={{...mk.card(T,{background:T.surfaceAlt,padding:18})}}>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}><Icons.match/><span style={{fontSize:14,fontWeight:600,color:T.text}}>{sec.title}</span></div>
-      <p style={{fontSize:13,color:T.muted,marginBottom:16,marginTop:4}}>{sec.instructions}</p>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-        {["left","right"].map(side=>(
-          <div key={side}>
-            <div style={{...mk.label(T,{marginBottom:8})}}>{side==="left"?"Hungarian":"English"}</div>
-            {(sec.pairs||[]).map((p,i)=>{
-              const m=side==="left"?matchSt.matched.find(x=>x.left===i):matchSt.matched.find(x=>x.right===i);
-              const active=side==="left"&&matchSt.left===i;
-              return <button key={i} aria-pressed={!!m}
-                onClick={()=>{
-                  HAPTIC.tick();
-                  if(side==="left"){setMatchSt(prev=>({...prev,left:prev.left===i?null:i}));}
-                  else{if(matchSt.left===null||matchSt.matched.find(x=>x.right===i))return;const correct=matchSt.left===i;setMatchSt(prev=>({left:null,matched:[...prev.matched,{left:prev.left,right:i,correct}]}));}
-                }}
-                style={{display:"block",width:"100%",padding:"9px 12px",marginBottom:6,borderRadius:8,textAlign:"left",border:`1.5px solid ${active?T.accent:m?(m.correct?T.success:T.accent):T.border}`,background:m?(m.correct?T.successBg:T.accentSoft):T.surface,color:m?(m.correct?T.successText:T.accent):T.text,cursor:"pointer",fontFamily:side==="left"?"Georgia,serif":"inherit",fontSize:13,fontWeight:side==="left"?600:400}}>
-                {side==="left"?p.left:p.right}
-              </button>;
-            })}
-          </div>
-        ))}
+      <p style={{fontSize:13,color:T.muted,marginBottom:12,marginTop:4}}>{sec.instructions}</p>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4,marginBottom:4}}>
+        <div style={{...mk.label(T,{marginBottom:6,paddingLeft:2})}}>Hungarian</div>
+        <div style={{...mk.label(T,{marginBottom:6,paddingLeft:2})}}>English</div>
       </div>
-      {matchSt.matched.length===(sec.pairs||[]).length&&(sec.pairs||[]).length>0&&(
-        <div role="status" style={{marginTop:12,padding:"10px 14px",borderRadius:8,background:T.successBg,color:T.successText,fontWeight:500,fontSize:13,display:"flex",gap:8,alignItems:"center"}}>
-          <Icons.check/>{matchSt.matched.every(m=>m.correct)?"All matched!": `${matchSt.matched.filter(m=>m.correct).length}/${(sec.pairs||[]).length} correct — try again.`}
-        </div>
-      )}
+      {pairs.map((p,i) => {
+        const mL=matchSt.matched.find(x=>x.left===i);
+        const mR=matchSt.matched.find(x=>x.right===i);
+        return (
+          <div key={i} style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4,marginBottom:4,alignItems:"stretch"}}>
+            <button aria-pressed={!!mL} onClick={()=>{HAPTIC.tick();setMatchSt(p=>({...p,left:p.left===i?null:i}));}} style={bStyle(mL,matchSt.left===i,true)}>{p.left}</button>
+            <button aria-pressed={!!mR} onClick={()=>{HAPTIC.tick();if(matchSt.left===null||matchSt.matched.find(x=>x.right===i))return;const c=matchSt.left===i;c?HAPTIC.success():HAPTIC.error();setMatchSt(p=>({left:null,matched:[...p.matched,{left:p.left,right:i,correct:c}]}));}} style={bStyle(mR,false,false)}>{p.right}</button>
+          </div>
+        );
+      })}
+      {allDone&&<div role="status" style={{marginTop:10,padding:"10px 14px",borderRadius:8,background:allCorrect?T.successBg:T.accentSoft,color:allCorrect?T.successText:T.accent,fontWeight:500,fontSize:13,display:"flex",gap:8,alignItems:"center"}}><Icons.check/>{allCorrect?"All matched correctly! ✓":`${matchSt.matched.filter(m=>m.correct).length}/${pairs.length} correct — tap to retry`}</div>}
+    </div>
+  );
+}
+
+// ─── Interactive conjugation table ─────────────────────────────
+function ConjTable({data, T}) {
+  const [filled, setFilled] = useState({});
+  const [checked, setChecked] = useState(false);
+  if (!data || !data.forms) return null;
+  const labels = data.labels || ['én','te','ő/az','mi','ti','ők/azok'];
+  const indef  = data.forms.indef || [];
+  const def    = data.forms.def   || [];
+  const hasDef = def.length > 0;
+  const correct = (side, i) => side==='indef' ? indef[i] : def[i];
+  const isRight = (side, i) => (filled[side+i]||'').trim().toLowerCase() === correct(side,i).toLowerCase();
+  const check = () => { HAPTIC.medium(); setChecked(true); };
+  const reset = () => { setFilled({}); setChecked(false); HAPTIC.light(); };
+  const countRight = labels.reduce((a,_,i)=>{let r=0;if(indef[i]&&isRight('indef',i))r++;if(hasDef&&def[i]&&isRight('def',i))r++;return a+r;},0);
+  const countTotal = labels.reduce((a,_,i)=>{let t=0;if(indef[i])t++;if(hasDef&&def[i])t++;return a+t;},0);
+  const cellSt = (side, i, isHdr) => ({
+    padding:'6px 8px', fontSize:isHdr?11:13,
+    background: isHdr?T.accentSoft:(checked?(isRight(side,i)?T.successBg:T.accentSoft):(i%2?T.surfaceAlt:T.surface)),
+    border:'1px solid '+T.border, fontWeight:isHdr?700:400,
+    color:isHdr?T.accent:(checked?(isRight(side,i)?T.successText:T.accent):T.text),
+    outline:'none', minWidth:0, width:'100%', fontFamily:'Georgia,serif',
+  });
+  return (
+    <div style={{marginTop:14}}>
+      <div style={{...mk.label(T,{marginBottom:8})}}>Fill in the conjugation: <span style={{fontFamily:'Georgia,serif',fontWeight:700}}>{data.verb}</span></div>
+      <div style={{overflowX:'auto',marginBottom:8}}>
+        <table style={{width:'100%',borderCollapse:'collapse',minWidth:hasDef?320:200}}>
+          <thead><tr>
+            <th style={{...cellSt('',0,true),textAlign:'left'}}>Person</th>
+            <th style={{...cellSt('',0,true),textAlign:'left'}}>Indefinite</th>
+            {hasDef&&<th style={{...cellSt('',0,true),textAlign:'left'}}>Definite</th>}
+          </tr></thead>
+          <tbody>
+            {labels.map((lbl,i)=>(
+              <tr key={i}>
+                <td style={{...cellSt('',i,false),color:T.muted,fontFamily:'inherit',fontSize:12}}>{lbl}</td>
+                <td style={{padding:0}}><input value={filled['indef'+i]||''} disabled={checked} onChange={e=>setFilled(p=>({...p,['indef'+i]:e.target.value}))} placeholder={checked?correct('indef',i):'…'} style={{...cellSt('indef',i,false),display:'block',width:'100%'}}/></td>
+                {hasDef&&<td style={{padding:0}}><input value={filled['def'+i]||''} disabled={checked} onChange={e=>setFilled(p=>({...p,['def'+i]:e.target.value}))} placeholder={checked?correct('def',i):'…'} style={{...cellSt('def',i,false),display:'block',width:'100%'}}/></td>}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div style={{display:'flex',gap:8,alignItems:'center'}}>
+        {!checked?<button onClick={check} style={mk.btn(T,'secondary')}><Icons.check/> Check</button>:<button onClick={reset} style={mk.btn(T,'secondary')}><Icons.refresh/> Try Again</button>}
+        {checked&&<span style={{fontSize:12,color:countRight===countTotal?T.success:T.accent,fontWeight:500}}>{countRight===countTotal?'Perfect! ✓':countRight+'/'+countTotal+' correct'}</span>}
+      </div>
     </div>
   );
 }
@@ -494,6 +566,30 @@ const CURRICULUM = [
   // ══ A1 ══
   { level:"A1", color:"#22c55e", title:"Absolute Beginner", chapters:[
     { id:"a1-alphabet", title:"The Alphabet & Pronunciation", icon:"📖", sections:[
+      { type:"example", title:"🔊 Pronunciation Drill — tap any word to hear it",
+        examples:[
+          {hu:"s — só",      en:"sh (like show)",       note:"só = salt"},
+          {hu:"sz — szó",    en:"s (like sun)",         note:"szó = word"},
+          {hu:"cs — csak",   en:"ch (like church)",     note:"csak = only"},
+          {hu:"c — cica",    en:"ts (like pizza)",      note:"cica = kitten"},
+          {hu:"zs — zseb",   en:"zh (like genre)",      note:"zseb = pocket"},
+          {hu:"gy — gyerek", en:"dy (British duty)",    note:"gyerek = child"},
+          {hu:"ny — nyak",   en:"ny (like señor)",      note:"nyak = neck"},
+          {hu:"ty — tyúk",   en:"ty (British stew)",    note:"tyúk = hen"},
+          {hu:"a — apa",     en:"short o (like hot)",   note:"apa = father"},
+          {hu:"á — ár",      en:"long a (like father)", note:"ár = price"},
+          {hu:"e — este",    en:"short e (like bed)",   note:"este = evening"},
+          {hu:"é — él",      en:"long ay (like they)",  note:"él = he lives"},
+          {hu:"ö — öreg",    en:"like German ö",        note:"öreg = old"},
+          {hu:"ő — őr",      en:"long ő (extended ö)",  note:"őr = guard"},
+          {hu:"ü — ülni",    en:"like German ü",        note:"ülni = to sit"},
+          {hu:"ű — fű",      en:"long ű (extended ü)",  note:"fű = grass"},
+          {hu:"ly — folyó",  en:"y sound (same as j!)", note:"folyó = river"},
+          {hu:"h — hal",     en:"h always pronounced",  note:"hal = fish"},
+          {hu:"r — reggel",  en:"rolled r (Italian r)", note:"reggel = morning"},
+          {hu:"kell",        en:"double = held longer", note:"kell = needed/must"},
+        ]
+      },
       { type:"concept", title:"One Letter = One Sound — Always",
         body:"Hungarian is phonemic: every letter maps to exactly one sound with no exceptions.\n\n**The 44-letter alphabet includes:**\n• Single letters: a á b c d e é f g h i í j k l m n o ó ö ő p r s t u ú ü ű v z\n• Digraphs (2 chars = 1 sound): cs, dz, gy, ly, ny, sz, ty, zs\n• Trigraph (3 chars = 1 sound): dzs\n\n**Critical sound rules:**\n• **s** = 'sh' (só = salt sounds like 'show')\n• **sz** = 's' (szó = word sounds like 'so')\n• **c** = 'ts' (like tsunami — NEVER like cat)\n• **cs** = 'ch' (csak = only)\n• **j** and **ly** both = 'y' (like yellow — identical sound!)\n• **zs** = 'zh' (like genre)\n• **gy** = soft 'dy' (like British 'duty')\n• **ny** = 'ny' (like Spanish señor)\n• **ty** = soft 'ty' (like British 'stew')\n• **r** = lightly rolled, always pronounced\n\n**Vowel length rules:**\n• Accent marks (á é í ó ő ú ű) indicate LENGTH not stress\n• Short vowels: a e i o ö u ü — Long vowels: á é í ó ő ú ű\n• Length can change meaning: kor (age) vs. kór (disease)\n\n**Stress always falls on the FIRST syllable** — no exceptions." },
       { type:"example", title:"20 Sound Examples in Practice",
@@ -630,6 +726,10 @@ const CURRICULUM = [
         takeaways:["**Learn the plural, get the accusative free** — accusative = replace -k with -t, keeping the same link vowel.","**Groups 1-3 cover ~80% of all nouns** — master these first before worrying about the irregular groups.","**V-words (Group 7) are common and must be memorized:** tó→tavak, ló→lovak, kő→kövek, fű→füvek.","**No gender in Hungarian** — every noun follows the same pluralization rules regardless of meaning.","**Group 5 (long vowel shortens) includes some very common words:** madár, víz, kenyér, tűz, tél, szél."] }
     ]},
     { id:"a1-verbs", title:"Verbs — Present Tense", icon:"⚡", sections:[
+      { type:"conjTable", title:"Practice: lát (to see)", verb:"lát",
+        forms:{indef:["látok","látsz","lát","látunk","láttok","látnak"],def:["látom","látod","látja","látjuk","látjátok","látják"]}},
+      { type:"conjTable", title:"Practice: megy (to go)", verb:"megy",
+        forms:{indef:["megyek","mész","megy","megyünk","mentek","mennek"],def:[]}},
       { type:"concept", title:"Two Conjugation Systems — Definite & Indefinite",
         body:"Hungarian verbs have **two full conjugation systems**. This is the most important grammar rule.\n\n**Use INDEFINITE when:**\n• No object: Megyek. (I'm going.) · Alszom. (I'm sleeping.)\n• Indefinite object (egy / no article): Látok egy házat. · Eszek kenyeret.\n• Object is 1st/2nd person: Látlak. (I see you.) · Szeretlek. (I love you.)\n\n**Use DEFINITE when:**\n• Object has definite article a/az: Látom a házat. · Eszem a kenyeret.\n• Object is a proper name: Látom Pétert. · Szeretem Marit.\n• Object has a possessive ending: Látom a házát. (I see his house.)\n\n**Present Indefinite — lát (to see):**\n| Person | Singular | Plural |\n|--------|---------|--------|\n| 1st | látok | látunk |\n| 2nd | látsz | láttok |\n| 3rd | lát | látnak |\n\n**Present Definite — lát (to see):**\n| Person | Singular | Plural |\n|--------|---------|--------|\n| 1st | látom | látjuk |\n| 2nd | látod | látjátok |\n| 3rd | látja | látják |\n\n**Pro-drop:** Pronouns usually omitted because verb endings show person.\nMegyek = I'm going · Olvasol = You're reading · Alszik = He/She is sleeping" },
       { type:"example", title:"20 Definite vs. Indefinite Examples",
@@ -684,10 +784,15 @@ const CURRICULUM = [
         takeaways:["**The single most important rule:** see 'a' or 'az' before the object → use definite conjugation.","**Látok egy házat vs. Látom a házat** — memorize this pair. It demonstrates the entire system.","**Pro-drop is natural** — never force pronouns unless emphasizing. Megyek means 'I am going', én megyek means 'I AM going (not someone else)'.","**-lak/-lek is a gift** — one form covers 'I see/love/know you'. Látlak, Szeretlek, Ismerlek.","**Build the habit now:** before every verb, ask 'is the object definite?' This reflex is worth more than any rule list."] }
     ]},
     { id:"a1-vocabulary", title:"Everyday Vocabulary", icon:"🗣️", sections:[
-      { type:"concept", title:"Greetings, Numbers, Colors & Days",
+      { type:"concept", title:"Greetings, Numbers, Colors, Days & Dates",
         body:"**Greetings & Essentials:**\n• Szia! / Helló! — Hi! (informal)\n• Szervusz! — Hello! (old-fashioned informal)\n• Jó reggelt! — Good morning!\n• Jó napot! — Good day! (formal)\n• Jó estét! — Good evening!\n• Jó éjszakát! — Good night!\n• Viszontlátásra! / Viszlát! — Goodbye!\n• Köszönöm / Köszi — Thank you / Thanks\n• Kérem / Kérem szépen — Please / You're welcome\n• Igen — Yes · Nem — No · Talán — Maybe\n• Elnézést! — Excuse me! / Sorry!\n• Nem értem. — I don't understand.\n• Nem tudom. — I don't know.\n• Segítség! — Help!\n\n**Numbers 1–20:** egy, kettő/két, három, négy, öt, hat, hét, nyolc, kilenc, tíz, tizenegy, tizenkettő, tizenhárom, tizennégy, tizenöt, tizenhat, tizenhét, tizennyolc, tizenkilenc, húsz\n\n**Colors:** piros (red), kék (blue), zöld (green), sárga (yellow), fehér (white), fekete (black), barna (brown), szürke (gray), lila (purple), narancs/narancssárga (orange), rózsaszín (pink), arany (gold), ezüst (silver)\n\n**Days:** hétfő (Mon), kedd (Tue), szerda (Wed), csütörtök (Thu), péntek (Fri), szombat (Sat), vasárnap (Sun)" },
       { type:"example", title:"20 Essential Vocabulary Examples",
         examples:[
+          {hu:"száz",en:"one hundred",note:"200=kétszáz, 300=háromszáz — prefix multiplier"},
+          {hu:"ezer",en:"one thousand",note:"2000=kétezer, 1994=ezerkilencszázkilencvennégy"},
+          {hu:"1994. április 3-án",en:"on 3rd April 1994",note:"-ban/-ben for year; -án/-én for day"},
+          {hu:"első / második / harmadik",en:"first / second / third",note:"ordinals: -adik/-edik/-ödik"},
+          {hu:"hányadika van ma?",en:"what is today's date?",note:"hányadika = which ordinal date"},
           {hu:"Jó reggelt!",en:"Good morning!",note:"reggel = morning"},
           {hu:"Jó napot!",en:"Good day! (formal)",note:"used with strangers/formally"},
           {hu:"Jó estét!",en:"Good evening!",note:"este = evening"},
@@ -883,6 +988,20 @@ Soha nem megyek oda. (I never go there.) — BOTH soha AND nem are required.` },
         ]},
     ]},
     { id:"a1-food", title:"Food, Eating & Hungarian Cuisine", icon:"🍽️", sections:[
+      { type:"example", title:"🗣️ Dialogue: At the Restaurant",
+        examples:[
+          {hu:"Pincér: Jó napot! Asztalt foglalt?",en:"Waiter: Good day! Did you book a table?",note:"foglalt = reserved"},
+          {hu:"Vendég: Nem, nem foglaltam. Van szabad asztal?",en:"Guest: No I didn't. Is there a free table?",note:"szabad = free/available"},
+          {hu:"Pincér: Igen, tessék. Mit parancsol?",en:"Waiter: Yes, this way. What would you like?",note:"parancsol = formal for would you like"},
+          {hu:"Vendég: Kérnék egy gulyáslevest és egy sört.",en:"Guest: I would like a goulash soup and a beer.",note:"kérnék = conditional, polite"},
+          {hu:"Pincér: Milyen sört kér? Csapon van Dreher.",en:"Waiter: What beer? We have Dreher on tap.",note:"csapon = on tap"},
+          {hu:"Vendég: Egy Drehert kérek. Kaphatok vizet is?",en:"Guest: A Dreher please. Can I have water too?",note:"kaphatok = can I get"},
+          {hu:"Pincér: Természetesen. Egy pillanat!",en:"Waiter: Of course. One moment!",note:"természetesen = naturally"},
+          {hu:"Vendég: Kérem a számlát!",en:"Guest: The bill please!",note:"standard phrase — memorize this"},
+          {hu:"Pincér: Tessék. Összesen 4500 forint.",en:"Waiter: Here you go. 4500 forints total.",note:"összesen = in total"},
+          {hu:"Vendég: Tartsa meg a visszajárót.",en:"Guest: Keep the change.",note:"visszajáró = change (money back)"},
+        ]
+      },
       { type:"concept", title:"Food Vocabulary, Ordering, and Meals",
         body:`**Hungarian meals (étkezések):**
 • reggeli — breakfast · tízórai — mid-morning snack
@@ -2023,6 +2142,20 @@ Future: leszek, leszel, lesz, leszünk, lesztek, lesznek` },
         ]},
     ]},
     { id:"b2-body-health", title:"Body, Health & Medical Language", icon:"🏥", sections:[
+      { type:"example", title:"🗣️ Dialogue: At the Doctor",
+        examples:[
+          {hu:"Doktor: Tessék, foglaljon helyet. Mi a panasza?",en:"Doctor: Please sit. What is your complaint?",note:"panasz = complaint/symptom"},
+          {hu:"Beteg: Fáj a torkom és lázam van.",en:"Patient: My throat hurts and I have a fever.",note:"torok = throat; láz = fever"},
+          {hu:"Doktor: Mióta fáj a torka?",en:"Doctor: How long has your throat been hurting?",note:"mióta = since when"},
+          {hu:"Beteg: Két napja. Nehéz nyelni és köhögök.",en:"Patient: Two days. Hard to swallow, I am coughing.",note:"nyelni = to swallow; köhögni = to cough"},
+          {hu:"Doktor: Nyissa ki a száját, légyen szíves!",en:"Doctor: Open your mouth please!",note:"nyissa ki = open (formal imperative)"},
+          {hu:"Doktor: Gyulladt a mandulája. Antibiotikumot írok fel.",en:"Doctor: Tonsil inflamed. I will prescribe antibiotics.",note:"gyulladt = inflamed; felír = prescribes"},
+          {hu:"Beteg: Allergiás vagyok a penicillinre.",en:"Patient: I am allergic to penicillin.",note:"allergiás vmi-re = allergic to something"},
+          {hu:"Doktor: Akkor amoxicillint adok. Háromszor naponta.",en:"Doctor: Then amoxicillin. Three times a day.",note:"háromszor naponta = three times daily"},
+          {hu:"Beteg: Meddig kell szednem?",en:"Patient: How long do I take it?",note:"meddig = until when; szedni = to take medicine"},
+          {hu:"Doktor: Egy hétig. Ha nem javul, jöjjön vissza.",en:"Doctor: One week. If not better, come back.",note:"ha nem javul = if it does not get better"},
+        ]
+      },
       { type:"concept", title:"Body Parts, Health Vocabulary & Medical Conversations",
         body:`**Body parts (testrészek):**
 | Hungarian | English | Hungarian | English |
@@ -2856,12 +2989,17 @@ const QUIZZES = {
 
 
 
-window.__App = function MagyarDiak() {
+window.__App=function MagyarDiak() {
 
   // ── Persisted state ──────────────────────────────────────────
   const [themeKey,       setThemeKey]       = useState('piros');
   const [hapticEnabled,  setHapticEnabled]  = useState(true);
-  const [profile,        setProfile]        = useState({ done:[], best:{}, streak:0, xp:0, lastLogin:null });
+  const [textSize,       setTextSize]       = useState('md'); // 'sm' | 'md' | 'lg'
+  const [reminderOn,     setReminderOn]     = useState(false);
+  const [installPrompt,  setInstallPrompt]  = useState(null);
+  const [showInstall,    setShowInstall]    = useState(false);
+  const [reminderTime,   setReminderTime]   = useState('09:00');
+  const [profile,        setProfile]        = useState({ done:[], best:{}, streak:0, xp:0, lastLogin:null, streakFreezes:0 });
   const [userQuestions,  setUserQuestions]  = useState([]);
   const [userSentences,  setUserSentences]  = useState([]);
   const [userVocabulary, setUserVocabulary] = useState([]);
@@ -2886,6 +3024,7 @@ window.__App = function MagyarDiak() {
   const [exShow,     setExShow]     = useState({});
   const [matchSt,    setMatchSt]    = useState({ left:null, matched:[] });
   const [editMode,   setEditMode]   = useState(false);
+  const [chapDone,   setChapDone]   = useState(null);
 
   // ── Quiz state ───────────────────────────────────────────────
   const [quiz,        setQuiz]        = useState(null);
@@ -2902,17 +3041,87 @@ window.__App = function MagyarDiak() {
   const [confirmDel,  setConfirmDel]  = useState(null);
 
   const T = THEMES[themeKey];
+  const TS = textSize==='sm' ? {base:13,body:13,ex:14,h2:16,h3:15}
+           : textSize==='lg' ? {base:16,body:16,ex:17,h2:21,h3:19}
+           :                   {base:14,body:14.5,ex:15,h2:18,h3:17};
 
   // ── Haptic gate ──────────────────────────────────────────────
   useEffect(() => { window.__hapticOn = hapticEnabled; }, [hapticEnabled]);
+
+  // ── Keyboard shortcuts (desktop) ─────────────────────────────
+  useEffect(() => {
+    const handler = (e) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      // SRS: Space = show answer, 1-4 = rate
+      if (srsSession && !srsSession.done && srsSession.shown) {
+        if (e.key === '1') { e.preventDefault(); rateSrs(1); }
+        if (e.key === '2') { e.preventDefault(); rateSrs(3); }
+        if (e.key === '3') { e.preventDefault(); rateSrs(4); }
+        if (e.key === '4') { e.preventDefault(); rateSrs(5); }
+      }
+      if (srsSession && !srsSession.done && !srsSession.shown && e.key === ' ') {
+        e.preventDefault(); showSrsAnswer();
+      }
+      // Quiz: 1-4 = answer options, Enter = continue
+      if (view === 'practice' && quiz && !quiz.done) {
+        if (e.key === 'Enter' && quiz.res) { e.preventDefault(); advanceQuiz(); }
+        if (!quiz.res && ['1','2','3','4'].includes(e.key)) {
+          e.preventDefault(); answerQuiz(parseInt(e.key)-1);
+        }
+      }
+      // Learn: ArrowRight = next section, ArrowLeft = prev
+      if (view === 'learn' && selChap) {
+        const secs = selChap.sections || [];
+        if (e.key === 'ArrowRight' && secIdx < secs.length-1) { e.preventDefault(); setSecIdx(s=>s+1); resetEx(); }
+        if (e.key === 'ArrowLeft'  && secIdx > 0)             { e.preventDefault(); setSecIdx(s=>s-1); resetEx(); }
+        if (e.key === 'Escape') { e.preventDefault(); setSelChap(null); setSecIdx(0); resetEx(); }
+      }
+      // Global: / = open search
+      if (e.key === '/' && !showSearch) { e.preventDefault(); setShowSearch(true); }
+      if (e.key === 'Escape' && showSearch) { e.preventDefault(); setShowSearch(false); setSearchQuery(''); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [srsSession, quiz, view, selChap, secIdx, showSearch]);
+
+  // ── PWA install prompt ────────────────────────────────────────
+  useEffect(() => {
+    const handler = e => { e.preventDefault(); setInstallPrompt(e); };
+    window.addEventListener('beforeinstallprompt', handler);
+    // Show nudge after 30s on first ever visit (no saved data)
+    const saved = persist.load();
+    if (!saved) {
+      const t = setTimeout(() => setShowInstall(true), 30000);
+      return () => { clearTimeout(t); window.removeEventListener('beforeinstallprompt', handler); };
+    }
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
 
   // ── Streak updater ────────────────────────────────────────────
   useEffect(() => {
     const today = new Date().toDateString();
     if (profile.lastLogin !== today) {
       const yesterday = new Date(Date.now() - 86400000).toDateString();
-      const newStreak = profile.lastLogin === yesterday ? profile.streak + 1 : 1;
+      const dayBefore  = new Date(Date.now() - 172800000).toDateString();
+      let newStreak = profile.streak;
+      if (profile.lastLogin === yesterday) {
+        newStreak = profile.streak + 1;
+      } else if (profile.lastLogin === dayBefore && profile.streakFreezes > 0) {
+        // Freeze used automatically to bridge a missed day
+        newStreak = profile.streak + 1;
+        setProfile(p => ({ ...p, lastLogin: today, streak: newStreak, streakFreezes: Math.max(0, p.streakFreezes-1) }));
+        notify('Streak freeze used! Streak protected 🛡️');
+        return;
+      } else {
+        newStreak = 1;
+      }
       setProfile(p => ({ ...p, lastLogin: today, streak: newStreak }));
+      // Award freeze at XP milestones
+      if ([500,1000,2000,3500,5000].includes(profile.xp + 30)) {
+        setProfile(p => ({ ...p, streakFreezes: (p.streakFreezes||0)+1 }));
+        notify('🛡️ Streak Freeze earned!');
+      }
     }
   }, []);
 
@@ -2927,6 +3136,9 @@ window.__App = function MagyarDiak() {
       if (saved.userSentences)  setUserSentences(saved.userSentences);
       if (saved.userVocabulary) setUserVocabulary(saved.userVocabulary);
       if (saved.practiceTab)    setPracticeTab(saved.practiceTab);
+      if (saved.textSize)       setTextSize(saved.textSize);
+      if (saved.reminderOn)     setReminderOn(saved.reminderOn);
+      if (saved.reminderTime)   setReminderTime(saved.reminderTime);
       if (saved.srsCards)       setSrsCards(saved.srsCards);
       if (saved.customChapters) setCustomChapters(saved.customChapters);
       if (saved.editedChapters) setEditedChapters(saved.editedChapters);
@@ -2937,8 +3149,8 @@ window.__App = function MagyarDiak() {
 
   // ── Persistence: auto-save ────────────────────────────────────
   useEffect(() => {
-    persist.save({ themeKey, hapticEnabled, profile, userQuestions, userSentences, userVocabulary, srsCards, customChapters, editedChapters, practiceTab });
-  }, [themeKey, hapticEnabled, profile, userQuestions, userSentences, userVocabulary, srsCards, customChapters, editedChapters, practiceTab]);
+    persist.save({ themeKey, hapticEnabled, textSize, reminderOn, reminderTime, profile, userQuestions, userSentences, userVocabulary, srsCards, customChapters, editedChapters, practiceTab });
+  }, [themeKey, hapticEnabled, textSize, reminderOn, reminderTime, profile, userQuestions, userSentences, userVocabulary, srsCards, customChapters, editedChapters, practiceTab]);
 
   // ── Full curriculum (built-in + user edits + custom) ─────────
   const fullCurriculum = useMemo(() => {
@@ -2958,7 +3170,7 @@ window.__App = function MagyarDiak() {
   }, [customChapters, editedChapters]);
 
   // ── Search index ──────────────────────────────────────────────
-  const searchIdx     = useMemo(() => buildSearchIndex(fullCurriculum), [fullCurriculum]);
+  const searchIdx     = useMemo(() => buildSearchIndex(fullCurriculum, userSentences, userVocabulary, userQuestions), [fullCurriculum, userSentences, userVocabulary, userQuestions]);
   const searchResults = useMemo(() => searchIndex(searchIdx, searchQuery), [searchIdx, searchQuery]);
 
   // ── SRS cards ─────────────────────────────────────────────────
@@ -2994,18 +3206,20 @@ window.__App = function MagyarDiak() {
   const donePct  = Math.round((profile.done.length / totalCh) * 100);
   const notify   = (msg) => { setNotif(msg); setTimeout(() => setNotif(null), 2600); };
   const resetEx  = () => { setExAns({}); setExShow({}); setMatchSt({ left:null, matched:[] }); };
-  const goView   = v => {
+  const goView   = (v, force=false) => {
+    const alreadyHere = !force && view === v;
     setView(v); setNavOpen(false); setShowSearch(false);
-    if (v !== 'learn') { setSelLevel(null); setSelChap(null); }
     if (v !== 'settings') setSettingsPage(null);
+    if (v === 'learn' || alreadyHere) { setSelLevel(null); setSelChap(null); setSecIdx(0); resetEx(); setEditMode(false); }
+    if (alreadyHere && v === 'practice') { setQuiz(null); setSrsSession(null); }
+    if (alreadyHere && v === 'notes') { setQbView('list'); setSelectedIds(new Set()); }
   };
 
-  const markDone = id => {
-    if (!profile.done.includes(id)) {
-      HAPTIC.success();
-      setProfile(p => ({ ...p, done:[...p.done, id], xp: p.xp + 30 }));
-      notify('Chapter complete · +30 XP');
-    }
+  const markDone = (id, title) => {
+    const already = profile.done.includes(id);
+    if (!already) { HAPTIC.success(); setProfile(p=>({...p,done:[...p.done,id],xp:p.xp+30})); }
+    else HAPTIC.light();
+    setChapDone({ id, title: title||id, xp: already?0:30, already });
   };
 
   const doMCQ = (ei, qi, oi) => {
@@ -3084,6 +3298,35 @@ window.__App = function MagyarDiak() {
   ) : null;
 
   // ── Onboarding ────────────────────────────────────────────────
+  const InstallBanner = () => !showInstall ? null : (
+    <div style={{position:'fixed',bottom:66,left:12,right:12,zIndex:400,animation:'fadeUp .3s ease'}}>
+      <div style={{...mk.card(T,{padding:'12px 14px',display:'flex',gap:10,alignItems:'center',boxShadow:T.shadowMd})}}>
+        <span style={{fontSize:22,flexShrink:0}}>📱</span>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:13,fontWeight:600,color:T.text}}>Install Magyar Diák</div>
+          <div style={{fontSize:11,color:T.muted}}>Add to home screen for offline access</div>
+        </div>
+        <button onClick={()=>{ HAPTIC.medium(); if(installPrompt){ installPrompt.prompt(); installPrompt.userChoice.then(()=>setInstallPrompt(null)); } setShowInstall(false); }} style={{...mk.btn(T,{padding:'7px 12px',fontSize:12,borderRadius:7,flexShrink:0})}}>Install</button>
+        <button onClick={()=>{ HAPTIC.light(); setShowInstall(false); }} style={{background:'none',border:'none',cursor:'pointer',color:T.muted,padding:4,flexShrink:0,fontSize:16}}>✕</button>
+      </div>
+    </div>
+  );
+
+  const ChapDoneModal = () => !chapDone ? null : (
+    <div style={{position:'fixed',inset:0,zIndex:600,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',padding:20}}>
+      <div style={{...mk.card(T,{padding:'28px 24px',maxWidth:340,width:'100%',textAlign:'center'})}}>
+        <div style={{fontSize:52,marginBottom:10}}>{chapDone.already?'📖':'🎉'}</div>
+        <div style={{fontSize:20,fontWeight:700,color:T.text,marginBottom:6}}>{chapDone.already?'Already complete':'Chapter complete!'}</div>
+        <div style={{fontSize:14,color:T.textSub,lineHeight:1.5,marginBottom:chapDone.xp?10:18}}>{chapDone.title}</div>
+        {chapDone.xp>0&&<div style={{display:'inline-flex',alignItems:'center',gap:6,background:T.accentSoft,color:T.accent,borderRadius:20,padding:'5px 14px',fontSize:13,fontWeight:600,marginBottom:18}}><Icons.zap/> +{chapDone.xp} XP earned</div>}
+        <div style={{display:'grid',gap:8}}>
+          <button onClick={()=>{HAPTIC.medium();setChapDone(null);setSelChap(null);setSecIdx(0);resetEx();setEditMode(false);}} style={{...mk.btn(T,{width:'100%',justifyContent:'center',padding:'13px'})}}>Back to chapters</button>
+          <button onClick={()=>{HAPTIC.light();setChapDone(null);}} style={{...mk.btn(T,'secondary',{width:'100%',justifyContent:'center'})}}>Stay on this chapter</button>
+        </div>
+      </div>
+    </div>
+  );
+
   const Onboarding = () => !showOnboard ? null : (
     <div style={{position:'fixed',inset:0,zIndex:600,background:'rgba(0,0,0,0.55)',display:'flex',alignItems:'flex-end',justifyContent:'center',padding:'0 0 66px'}}
       onClick={e => { if (e.target === e.currentTarget) setShowOnboard(false); }}>
@@ -3365,10 +3608,11 @@ window.__App = function MagyarDiak() {
           <div style={{...mk.card(T,{marginBottom:12,padding:20})}}>
             {cur && (() => {
               switch (cur.type) {
-                case 'concept':  return <ConceptSection sec={cur} T={T}/>;
-                case 'example':  return <ExampleSection sec={cur} T={T}/>;
+                case 'concept':  return <ConceptSection sec={cur} T={T} TS={TS}/>;
+                case 'example':  return <ExampleSection sec={cur} T={T} TS={TS}/>;
                 case 'vocab':    return <VocabSection sec={cur} T={T} IMGS={IMGS}/>;
                 case 'summary':  return <SummarySection sec={cur} T={T}/>;
+                case 'conjTable': return <ConjTable data={cur} T={T}/>;
                 case 'exercise':
                   if (cur.ex_type==='mcq')       return <ExerciseMCQ sec={cur} ei={secIdx} T={T} exAns={exAns} exShow={exShow} doMCQ={doMCQ}/>;
                   if (cur.ex_type==='truefalse')  return <ExerciseTF  sec={cur} ei={secIdx} T={T} exAns={exAns} exShow={exShow} doTF={doTF}/>;
@@ -3387,7 +3631,7 @@ window.__App = function MagyarDiak() {
               <Icons.chevL/>
             </button>
             {isLast ? (
-              <button onClick={() => markDone(selChap.id)}
+              <button onClick={() => markDone(selChap.id, ch.title)}
                 style={{flex:1,padding:'14px 20px',borderRadius:10,border:'none',background:isDone?T.successBg:T.accent,color:isDone?T.successText:T.accentText,fontWeight:700,fontSize:15,cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:isDone?'none':T.shadowMd}}>
                 <Icons.check/>{isDone?'Chapter Complete ✓':'Complete · +30 XP'}
               </button>
@@ -3485,6 +3729,7 @@ window.__App = function MagyarDiak() {
     const TABS = [
       {id:'srs',       label:'SRS Review', icon:<Icons.brain/>},
       {id:'quiz',      label:'Quiz',       icon:<Icons.target/>},
+      {id:'placement', label:'Placement',  icon:<Icons.compass/>},
       {id:'verbs',     label:'Verb Drill', icon:<Icons.zap/>},
       {id:'sentences', label:'Sentences',  icon:<Icons.typeText/>},
     ];
@@ -3556,8 +3801,32 @@ window.__App = function MagyarDiak() {
       }
 
       const totalCards = Object.keys(mergedSrsCards).length;
+      const leeches = Object.values(mergedSrsCards).filter(c => (c.repetitions===0 && c.interval===1 && c.easeFactor<=1.8) || (c.easeFactor<=1.6));
       return (
         <div>
+          {leeches.length > 0 && (
+            <div style={{...mk.card(T,{padding:'13px 16px',marginBottom:12,background:T.warningBg,borderLeft:`3px solid ${T.warning}`})}}>
+              <div style={{display:'flex',gap:10,alignItems:'flex-start'}}>
+                <span style={{fontSize:18,flexShrink:0}}>⚠️</span>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,fontWeight:600,color:T.warning,marginBottom:3}}>{leeches.length} leech card{leeches.length>1?'s':''} detected</div>
+                  <div style={{fontSize:12,color:T.muted,marginBottom:8}}>These words are being forgotten repeatedly. Consider reviewing them manually or removing them from the deck.</div>
+                  <details style={{fontSize:12}}>
+                    <summary style={{cursor:'pointer',color:T.warning,fontWeight:500}}>Show leeches ({leeches.length})</summary>
+                    <div style={{marginTop:8,display:'grid',gap:4}}>
+                      {leeches.map(c=>(
+                        <div key={c.id} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 10px',background:T.surface,borderRadius:6,border:`1px solid ${T.border}`}}>
+                          <span style={{fontWeight:700,color:T.accent,fontFamily:'Georgia,serif',flex:1}}>{c.hu}</span>
+                          <span style={{color:T.muted,fontSize:11}}>{c.en}</span>
+                          <button onClick={()=>{setSrsCards(p=>{const n={...p};delete n[c.id];return n;});HAPTIC.warning();}} style={{width:22,height:22,borderRadius:4,border:`1px solid ${T.accent}44`,background:T.accentSoft,cursor:'pointer',color:T.accent,fontSize:12,display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  </details>
+                </div>
+              </div>
+            </div>
+          )}
           <div style={{...mk.card(T,{padding:'22px 18px',marginBottom:12,textAlign:'center'})}}>
             <div style={{fontSize:40,marginBottom:8}}>🧠</div>
             <div style={{fontSize:17,fontWeight:600,color:T.text,marginBottom:6}}>Spaced Repetition Review</div>
@@ -3583,20 +3852,125 @@ window.__App = function MagyarDiak() {
       );
     };
 
+    // ── Placement test ─────────────────────────────────────────
+    const PlacementTestView = () => {
+      const PQ = [
+        {q:"'Good morning' in Hungarian:",opts:["Jó estét","Jó reggelt","Jó napot","Viszlát"],correct:1,level:'A1',explain:"Jó reggelt = Good morning. reggel = morning."},
+        {q:"Hungarian 'sz' sounds like:",opts:["sh in ship","s in sun","z in zero","ch in choose"],correct:1,level:'A1',explain:"sz = s (like sun). Plain s = sh (like shoe)."},
+        {q:"'I am Hungarian':",opts:["Magyar vagyok.","Magyar van.","Magyar vagy.","Magyar lesz."],correct:0,level:'A1',explain:"Magyar vagyok — vagyok = I am (1st person of van)."},
+        {q:"Plural of alma (apple):",opts:["almak","almák","almáok","almaek"],correct:1,level:'A1',explain:"almák — back-vowel word, plural -ák (a→á in stem)."},
+        {q:"'I see the house':",opts:["Látok a ház.","Látom a házat.","Látok a házat.","Látsz a ház."],correct:1,level:'A2',explain:"Látom (definite 1PS) + házat (accusative)."},
+        {q:"'Under the table' (static):",opts:["az asztal alá","az asztal alól","az asztal alatt","az asztal felett"],correct:2,level:'A2',explain:"alatt = under (static). alá = motion toward under."},
+        {q:"'Two apples' — noun form:",opts:["két almák","két alma","kettő almák","kettő almákat"],correct:1,level:'A2',explain:"After numbers the noun stays singular: két alma."},
+        {q:"'Where are you going?' (motion):",opts:["Hol mész?","Hova mész?","Honnan mész?","Mikor mész?"],correct:1,level:'A2',explain:"Hova? = Where to? (motion). Hol? = Where? (static)."},
+        {q:"Past tense of megy (3PS):",opts:["megyed","megy","ment","menett"],correct:2,level:'B1',explain:"megy → ment (went). Highly irregular."},
+        {q:"The prefix meg- indicates:",opts:["Direction away","Repeated action","Completion/perfectivity","Returning motion"],correct:2,level:'B1',explain:"meg- marks completion: eszik → megeszik (eats up)."},
+        {q:"'I have to go' — correct form:",opts:["Menni kell.","Menniük kell.","Mennem kell.","Menned kell."],correct:2,level:'B1',explain:"mennem kell = I have to go. Personal infinitive agrees with subject."},
+        {q:"Negative imperative 'Don't go!':",opts:["Nem megy!","Ne menj!","Menj nem!","Nem menj!"],correct:1,level:'B1',explain:"ne + imperative form: Ne menj! (ne, not nem, for imperatives)."},
+        {q:"'PETER bought it' — Peter is in:",opts:["Subject position","Focus before verb","After verb","Topic position"],correct:1,level:'B2',explain:"Focus goes directly before the finite verb: PÉTER vette meg."},
+        {q:"After megkértem, 'to come' is:",opts:["hogy jön","hogy jöjjön","hogy jönni","hogy jött"],correct:1,level:'B2',explain:"After megkért, Hungarian requires subjunctive (imperative form): jöjjön."},
+        {q:"-ható/-hető means:",opts:["-ing form","-able/-ible","-ness","-tion"],correct:1,level:'B2',explain:"-ható/-hető = -able/-ible. elvégezhető = can be accomplished."},
+        {q:"'Two days ago':",opts:["két nap előtt","két nappal ezelőtt","két nap után","két napja"],correct:1,level:'B2',explain:"két nappal ezelőtt = two days ago. -val ezelőtt = ago construction."},
+        {q:"-ván/-vén (Látván ezt...) is:",opts:["Modern colloquial","Archaic adverb participle","Future participle","Past conditional"],correct:1,level:'C1',explain:"-ván/-vén = archaic adverb participle. Still in formal/literary texts."},
+        {q:"Ön (formal you) takes which verb person?",opts:["2nd sg","2nd pl","3rd sg","1st pl"],correct:2,level:'C1',explain:"Ön takes 3rd person singular verb forms."},
+        {q:"Hungarian belongs to:",opts:["Indo-European","Turkic","Uralic (Finno-Ugric)","Semitic"],correct:2,level:'C1',explain:"Hungarian is Uralic/Finno-Ugric — related to Finnish and Estonian."},
+        {q:"minél...annál expresses:",opts:["Condition","The more...the more","Either...or","Neither...nor"],correct:1,level:'C1',explain:"minél...annál = the more...the more. Correlative comparative."},
+      ];
+      const [pts, setPts] = useState(null);
+      const startTest = () => { HAPTIC.medium(); const s=[...PQ].sort(()=>Math.random()-0.5); setPts({qs:s,cur:0,score:0,res:null,done:false,answers:[]}); };
+      const answer = (i) => { if(!pts||pts.res)return; HAPTIC.medium(); const ok=i===pts.qs[pts.cur].correct; ok?HAPTIC.success():HAPTIC.error(); setPts(p=>({...p,res:{ok,selected:i}})); };
+      const next = () => { if(!pts?.res)return; HAPTIC.light(); const ok=pts.res.ok; const ns=pts.score+(ok?1:0); const na=[...pts.answers,{level:pts.qs[pts.cur].level,ok}]; if(pts.cur+1>=pts.qs.length){setPts(p=>({...p,score:ns,answers:na,done:true,res:null}));return;} setPts(p=>({...p,score:ns,answers:na,cur:p.cur+1,res:null})); };
+      if(!pts) return (
+        <div>
+          <div style={{...mk.card(T,{padding:'24px 20px',textAlign:'center',marginBottom:12})}}>
+            <div style={{fontSize:40,marginBottom:12}}>🎯</div>
+            <div style={{fontSize:17,fontWeight:700,color:T.text,marginBottom:8}}>Placement Test</div>
+            <div style={{fontSize:13,color:T.muted,marginBottom:20,lineHeight:1.6}}>20 questions covering A1 to C1. Find out which level to start at — takes about 5 minutes.</div>
+            <button onClick={startTest} style={{...mk.btn(T,{margin:'0 auto',padding:'13px 28px'})}}><Icons.target/> Start Test</button>
+          </div>
+          <div style={{...mk.card(T,{padding:'13px 16px'})}}><div style={{fontSize:12,color:T.muted,lineHeight:1.6}}>Your result suggests where to begin in the curriculum, but you can always start at any level.</div></div>
+        </div>
+      );
+      if(pts.done){
+        const byL={A1:0,A2:0,B1:0,B2:0,C1:0},byLT={A1:0,A2:0,B1:0,B2:0,C1:0};
+        pts.answers.forEach(a=>{byLT[a.level]=(byLT[a.level]||0)+1;if(a.ok)byL[a.level]=(byL[a.level]||0)+1;});
+        const lvls=['A1','A2','B1','B2','C1']; let rec='A1';
+        for(const lv of lvls){if(byLT[lv]>0&&(byL[lv]||0)/byLT[lv]>=0.6)rec=lv;}
+        const lvd=fullCurriculum.find(l=>l.level===rec);
+        const pct=Math.round((pts.score/pts.qs.length)*100);
+        return (
+          <div>
+            <div style={{...mk.card(T,{padding:'28px 22px',textAlign:'center',marginBottom:12})}}>
+              <div style={{fontSize:48,marginBottom:10}}>📊</div>
+              <div style={{fontSize:22,fontWeight:700,color:T.text,marginBottom:4}}>{pct}% correct</div>
+              <div style={{fontSize:14,color:T.muted,marginBottom:16}}>{pts.score} / {pts.qs.length} questions</div>
+              <div style={{background:T.accentSoft,borderRadius:10,padding:'14px 16px',marginBottom:16}}>
+                <div style={{fontSize:12,color:T.muted,marginBottom:4}}>Recommended starting level</div>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10}}>
+                  {lvd&&<Pill color={lvd.color}>{rec}</Pill>}
+                  <span style={{fontSize:15,fontWeight:600,color:T.text}}>{rec==='A1'?'Start from the beginning':'Continue at '+rec}</span>
+                </div>
+              </div>
+              <div style={{display:'grid',gap:5,marginBottom:14}}>
+                {lvls.map(lv=>{const tot=byLT[lv]||0,got=byL[lv]||0,ld=fullCurriculum.find(l=>l.level===lv);if(!tot)return null;return(<div key={lv} style={{display:'flex',alignItems:'center',gap:10}}><Pill color={ld?.color||T.accent}>{lv}</Pill><div style={{flex:1}}><PBar pct={Math.round((got/tot)*100)} color={ld?.color||T.accent} h={6}/></div><span style={{fontSize:12,color:T.muted,minWidth:28,textAlign:'right'}}>{got}/{tot}</span></div>);})}
+              </div>
+              <div style={{display:'grid',gap:8}}>
+                <button onClick={()=>{const lv=fullCurriculum.find(l=>l.level===rec);setSelLevel(lv);goView('learn',true);}} style={{...mk.btn(T,{width:'100%',justifyContent:'center'})}}><Icons.book/> Go to {rec} chapters</button>
+                <button onClick={()=>setPts(null)} style={{...mk.btn(T,'secondary',{width:'100%',justifyContent:'center'})}}><Icons.refresh/> Retake Test</button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      const q=pts.qs[pts.cur],lvd2=fullCurriculum.find(l=>l.level===q.level);
+      return (
+        <div>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+            {lvd2&&<Pill color={lvd2.color}>{q.level}</Pill>}
+            <span style={{fontSize:13,color:T.muted}}>{pts.cur+1}/{pts.qs.length}</span>
+          </div>
+          <div style={{height:4,borderRadius:2,background:T.border,overflow:'hidden',marginBottom:14}}>
+            <div style={{height:'100%',width:`${Math.round((pts.cur/pts.qs.length)*100)}%`,background:lvd2?.color||T.accent,transition:'width .4s'}}/>
+          </div>
+          <div style={{...mk.card(T,{padding:20,marginBottom:10})}}>
+            <p style={{fontSize:15,fontWeight:500,lineHeight:1.6,color:T.text,marginBottom:16}}>{q.q}</p>
+            <div style={{display:'grid',gap:6}}>
+              {q.opts.map((o,i)=>{let bg=T.surface,bdr=T.border,col=T.textSub;if(pts.res){if(i===q.correct){bg=T.successBg;bdr=T.success;col=T.successText;}else if(i===pts.res.selected){bg=T.accentSoft;bdr=T.accent;col=T.accent;}}return(<button key={i} onClick={()=>answer(i)} style={{padding:'11px 14px',borderRadius:8,border:`1.5px solid ${bdr}`,background:bg,color:col,textAlign:'left',cursor:pts.res?'default':'pointer',fontFamily:'inherit',fontSize:14,display:'flex',gap:10,alignItems:'center',transition:'all .15s'}}><span style={{width:22,height:22,borderRadius:'50%',border:`1.5px solid ${bdr}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,color:T.muted,flexShrink:0}}>{String.fromCharCode(65+i)}</span>{o}</button>);})}
+            </div>
+            {pts.res&&(<><div style={{padding:'10px 13px',borderRadius:8,marginTop:10,marginBottom:10,fontSize:13,background:pts.res.ok?T.successBg:T.accentSoft,color:pts.res.ok?T.successText:T.accent,display:'flex',gap:8}}><span>{pts.res.ok?'✅':'❌'}</span><span>{q.explain}</span></div><button onClick={next} style={{...mk.btn(T,{width:'100%',justifyContent:'center',padding:'13px'})}}>{pts.cur+1>=pts.qs.length?'See Results':'Next Question'} <Icons.chevR/></button></>)}
+          </div>
+        </div>
+      );
+    };
+
     // ── Verb drill ──────────────────────────────────────────────
+
     const VerbDrillView = () => {
       const SESSION_LEN = 10;
       const VERBS = [
-        {inf:'megy', en:'to go',   forms:{indef:['megyek','mész','megy','megyünk','mentek','mennek'],def:['megyek','mész','megy','megyünk','mentek','megy']}},
-        {inf:'lát',  en:'to see',  forms:{indef:['látok','látsz','lát','látunk','láttok','látnak'],def:['látom','látod','látja','látjuk','látjátok','látják']}},
-        {inf:'olvas',en:'to read', forms:{indef:['olvasok','olvasol','olvas','olvasunk','olvastok','olvasnak'],def:['olvasom','olvasod','olvassa','olvassuk','olvassátok','olvassák']}},
-        {inf:'eszik',en:'to eat',  forms:{indef:['eszek','eszel','eszik','eszünk','esztek','esznek'],def:['eszem','eszed','eszi','esszük','eszitek','eszik']}},
-        {inf:'iszik',en:'to drink',forms:{indef:['iszok','iszol','iszik','iszunk','isztok','isznak'],def:['iszom','iszod','issza','isszuk','isszátok','isszák']}},
-        {inf:'van',  en:'to be',   forms:{indef:['vagyok','vagy','van','vagyunk','vagytok','vannak'],def:['vagyok','vagy','van','vagyunk','vagytok','vannak']}},
-        {inf:'ad',   en:'to give', forms:{indef:['adok','adsz','ad','adunk','adtok','adnak'],def:['adom','adod','adja','adjuk','adjátok','adják']}},
-        {inf:'vesz', en:'to take', forms:{indef:['veszek','veszel','vesz','veszünk','vesztek','vesznek'],def:['veszem','veszed','veszi','vesszük','veszitek','veszik']}},
+        {inf:'megy',  en:'to go',        tense:'present',forms:{indef:['megyek','mész','megy','megyünk','mentek','mennek'],     def:['megyek','mész','megy','megyünk','mentek','mennek']}},
+        {inf:'jön',   en:'to come',      tense:'present',forms:{indef:['jövök','jössz','jön','jövünk','jöttök','jönnek'],       def:['jövök','jössz','jön','jövünk','jöttök','jönnek']}},
+        {inf:'van',   en:'to be',        tense:'present',forms:{indef:['vagyok','vagy','van','vagyunk','vagytok','vannak'],      def:['vagyok','vagy','van','vagyunk','vagytok','vannak']}},
+        {inf:'tesz',  en:'to put/do',    tense:'present',forms:{indef:['teszek','teszel','tesz','teszünk','tesztek','tesznek'],  def:['teszem','teszed','teszi','tesszük','teszitek','teszik']}},
+        {inf:'vesz',  en:'to take/buy',  tense:'present',forms:{indef:['veszek','veszel','vesz','veszünk','vesztek','vesznek'],  def:['veszem','veszed','veszi','vesszük','veszitek','veszik']}},
+        {inf:'visz',  en:'to carry',     tense:'present',forms:{indef:['viszek','viszel','visz','viszünk','visztek','visznek'],  def:['viszem','viszed','viszi','visszük','viszitek','viszik']}},
+        {inf:'hisz',  en:'to believe',   tense:'present',forms:{indef:['hiszek','hiszel','hisz','hiszünk','hisztek','hisznek'],  def:['hiszem','hiszed','hiszi','hisszük','hiszitek','hiszik']}},
+        {inf:'lesz',  en:'to become',    tense:'present',forms:{indef:['leszek','leszel','lesz','leszünk','lesztek','lesznek'],  def:['leszek','leszel','lesz','leszünk','lesztek','lesznek']}},
+        {inf:'eszik', en:'to eat',       tense:'present',forms:{indef:['eszek','eszel','eszik','eszünk','esztek','esznek'],      def:['eszem','eszed','eszi','esszük','eszitek','eszik']}},
+        {inf:'iszik', en:'to drink',     tense:'present',forms:{indef:['iszom','iszol','iszik','iszunk','isztok','isznak'],      def:['iszom','iszod','issza','isszuk','isszátok','isszák']}},
+        {inf:'alszik',en:'to sleep',     tense:'present',forms:{indef:['alszom','alszol','alszik','alszunk','alsztok','alszanak'],def:['alszom','alszol','alszik','alszunk','alsztok','alszanak']}},
+        {inf:'lát',   en:'to see',       tense:'present',forms:{indef:['látok','látsz','lát','látunk','láttok','látnak'],        def:['látom','látod','látja','látjuk','látjátok','látják']}},
+        {inf:'kér',   en:'to ask/want',  tense:'present',forms:{indef:['kérek','kérsz','kér','kérünk','kértek','kérnek'],        def:['kérem','kéred','kéri','kérjük','kéritek','kérik']}},
+        {inf:'tud',   en:'to know/can',  tense:'present',forms:{indef:['tudok','tudsz','tud','tudunk','tudtok','tudnak'],         def:['tudom','tudod','tudja','tudjuk','tudjátok','tudják']}},
+        {inf:'ad',    en:'to give',      tense:'present',forms:{indef:['adok','adsz','ad','adunk','adtok','adnak'],               def:['adom','adod','adja','adjuk','adjátok','adják']}},
+        {inf:'ment',  en:'went (megy)',  tense:'past',   forms:{indef:['mentem','mentél','ment','mentünk','mentetek','mentek'],   def:['mentem','mentél','ment','mentünk','mentetek','mentek']}},
+        {inf:'volt',  en:'was (van)',    tense:'past',   forms:{indef:['voltam','voltál','volt','voltunk','voltatok','voltak'],   def:['voltam','voltál','volt','voltunk','voltatok','voltak']}},
+        {inf:'látott',en:'saw (lát)',    tense:'past',   forms:{indef:['láttam','láttál','látott','láttunk','láttatok','láttak'], def:['láttam','láttad','látta','láttuk','láttátok','látták']}},
+        {inf:'evett', en:'ate (eszik)',  tense:'past',   forms:{indef:['ettem','ettél','evett','ettünk','ettetek','ettek'],       def:['ettem','etted','ette','ettük','ettétek','ették']}},
+        {inf:'ivott', en:'drank (iszik)',tense:'past',   forms:{indef:['ittam','ittál','ivott','ittunk','ittatok','ittak'],       def:['ittam','ittad','itta','ittuk','ittátok','itták']}},
       ];
-      const PERSONS = ['1st PS','2nd PS','3rd PS','1st PP','2nd PP','3rd PP'];
+      const PERSONS=['1PS','2PS','3PS','1PP','2PP','3PP'];
+      const PERS_LONG=['1st person sg','2nd person sg','3rd person sg','1st person pl','2nd person pl','3rd person pl'];
 
       const randCard = () => {
         const verb = VERBS[Math.floor(Math.random()*VERBS.length)];
@@ -3653,7 +4027,7 @@ window.__App = function MagyarDiak() {
           <div style={{...mk.card(T,{padding:20,marginBottom:10})}}>
             <div style={{textAlign:'center',marginBottom:14}}>
               <div style={{fontSize:12,color:T.muted,marginBottom:4}}>
-                {drill.conj==='def'?'Definite':'Indefinite'} conjugation · {PERSONS[drill.person]}
+                {drill.verb.tense==='past'?'Past':'Present'} · {drill.conj==='def'?'Definite':'Indefinite'} · {PERS_LONG[drill.person]}
               </div>
               <div style={{fontSize:26,fontWeight:700,color:T.accent,fontFamily:'Georgia,serif',marginBottom:2}}>{drill.verb.inf}</div>
               <div style={{fontSize:14,color:T.muted}}>{drill.verb.en}</div>
@@ -3694,16 +4068,57 @@ window.__App = function MagyarDiak() {
     // ── Sentence builder ────────────────────────────────────────
     const SentenceBuilderView = () => {
       const CHALLENGES = [
-        {hu:'Látom a házat.',en:'I see the house.',hint:'lát + definite conjugation'},
+        // A1 — Basic sentences
+        {hu:'Jó reggelt!',en:'Good morning!',hint:'greeting'},
+        {hu:'Hogy vagy?',en:'How are you?',hint:'informal greeting'},
+        {hu:'Én magyar vagyok.',en:'I am Hungarian.',hint:'nationality + van'},
+        {hu:'Ez egy ház.',en:'This is a house.',hint:'demonstrative + noun'},
+        {hu:'A kutya nagy.',en:'The dog is big.',hint:'adjective predicate (no van needed)'},
+        {hu:'Két alma van az asztalon.',en:'There are two apples on the table.',hint:'-on = on surface'},
+        {hu:'Nem értem.',en:"I don't understand.",hint:'negation + definite conjugation'},
+        {hu:'Kérek egy pohár vizet.',en:'I would like a glass of water.',hint:'kér + accusative'},
+        // A2 — Cases and adjectives
+        {hu:'Látom a házat.',en:'I see the house.',hint:'accusative -t after definite'},
+        {hu:'Adok a barátomnak egy könyvet.',en:'I give a book to my friend.',hint:'dative -nak'},
+        {hu:'A piros autó az enyém.',en:'The red car is mine.',hint:'possessive pronoun'},
+        {hu:'Budapest szebb, mint Bécs.',en:'Budapest is more beautiful than Vienna.',hint:'comparison -bb + mint'},
+        {hu:'Nincs pénzem.',en:"I don't have money.",hint:'nincs + possession'},
+        {hu:'Három napja itt vagyok.',en:'I have been here for three days.',hint:'temporal -ja'},
+        // B1 — Prefixes and tenses
         {hu:'Elmegyek a boltba.',en:'I go to the shop.',hint:'el- prefix + -ba'},
         {hu:'Nem mentem el.',en:"I didn't go away.",hint:'negation separates prefix'},
-        {hu:'Kérnék egy kávét.',en:'I would like a coffee.',hint:'conditional mood'},
+        {hu:'Holnap el fogok menni.',en:"I will go tomorrow.",hint:'periphrastic future'},
         {hu:'Mennem kell.',en:'I have to go.',hint:'personal infinitive + kell'},
-        {hu:'A könyv az asztalon van.',en:'The book is on the table.',hint:'-on = on surface'},
-        {hu:'Ha tudnék, segítenék.',en:'If I could, I would help.',hint:'conditional clause'},
-        {hu:'Sírva mondta el.',en:'He said it while crying.',hint:'adverb participle -va'},
+        {hu:'Tudok úszni.',en:'I can swim.',hint:'tud + infinitive = skill'},
+        {hu:'Nem szabad dohányozni.',en:'Smoking is not allowed.',hint:'nem szabad + inf'},
+        {hu:'Megcsináltam a leckét.',en:'I did the homework.',hint:'meg- perfective prefix'},
         {hu:'Soha nem megyek oda.',en:'I never go there.',hint:'double negation required'},
+        // B2 — Complex structures
+        {hu:'Kérnék egy kávét.',en:'I would like a coffee.',hint:'conditional = polite'},
+        {hu:'Ha tudnék, segítenék.',en:'If I could, I would help.',hint:'conditional clause'},
+        {hu:'Megkértem, hogy jöjjön el.',en:'I asked him to come.',hint:'subjunctive after kér'},
+        {hu:'Fontos, hogy megértsd.',en:'It is important that you understand.',hint:'fontos + hogy + subj'},
+        {hu:'A könyv, amit olvastam, jó volt.',en:'The book I read was good.',hint:'amit relative'},
+        {hu:'Az, hogy eljöttél, sokat jelent.',en:'The fact that you came means a lot.',hint:'Az hogy nominalisation'},
+        {hu:'Nem Péter jött, hanem Anna.',en:'It was not Peter but Anna who came.',hint:'nem...hanem contrast'},
+        {hu:'Sírva mondta el.',en:'He said it while crying.',hint:'adverb participle -va'},
+        // C1-C2 — Advanced
+        {hu:'Minél több szót tanulsz, annál könnyebb lesz.',en:'The more words you learn, the easier it will be.',hint:'minél...annál correlative'},
+        {hu:'Bármennyire fáradt voltam, nem aludtam el.',en:'However tired I was, I could not fall asleep.',hint:'bármennyire = however'},
+        {hu:'Elvégzendő feladatok vannak.',en:'There are tasks to be done.',hint:'-andó/-endő obligatory ptcpl'},
+        {hu:'Látván ezt, nem szólhattam.',en:'Having seen this, I could not speak.',hint:'-ván adverb participle'},
+        {hu:'Tegezhetsz engem.',en:'You can use informal address with me.',hint:'tegez = use tu-form'},
         {hu:'Mit csináltál tegnap?',en:'What did you do yesterday?',hint:'past tense interrogative'},
+        {hu:'Hová mész ilyen sietve?',en:'Where are you going in such a hurry?',hint:'hová + manner adverb'},
+        {hu:'Oda kell adnom a jegyet.',en:'I have to give the ticket there.',hint:'personal inf + oda-'},
+        {hu:'Éhes vagyok, de nincs mit ennem.',en:"I am hungry but there's nothing to eat.",hint:'nincs + mit + inf'},
+        {hu:'A munka elvégezhető holnapig.',en:'The work can be done by tomorrow.',hint:'-ható/-hető = -able'},
+        {hu:'Szerintem igaza van.',en:'In my opinion, he is right.',hint:'szerintem = personal postposition'},
+        {hu:'Ahányszor látom, mindig mosolyog.',en:'Every time I see him, he is always smiling.',hint:'ahányszor...mindig'},
+        {hu:'Több mint száz éve épített ház.',en:'A house built more than a hundred years ago.',hint:'-tt past ptcpl as adj'},
+        {hu:'Megérdemli, hogy megdicsérjék.',en:'He deserves to be praised.',hint:'szubjunctive passive-like'},
+        {hu:'Tudtommal még nem érkezett meg.',en:'To my knowledge he has not yet arrived.',hint:'tudtommal = to my knowledge'},
+        {hu:'Legyen szíves megmutatni.',en:'Please be so kind as to show me.',hint:'formal request'},
       ];
       const [idx, setIdx]       = useState(0);
       const [input, setInput]   = useState('');
@@ -3782,9 +4197,10 @@ window.__App = function MagyarDiak() {
             </div>
             <div style={{fontSize:36,fontWeight:700,color:T.text,marginBottom:4}}>{pct}%</div>
             <div style={{fontSize:14,color:T.muted,marginBottom:22}}>{quiz.score}/{quiz.qs.length} correct · +{quiz.score*10} XP</div>
-            <div style={{display:'flex',gap:8,justifyContent:'center',flexWrap:'wrap'}}>
-              <button onClick={() => startQuiz(quiz.lv)} style={mk.btn(T)}><Icons.refresh/> Retry</button>
-              <button onClick={() => setQuiz(null)} style={mk.btn(T,'secondary')}>All Quizzes</button>
+            <div style={{display:'grid',gap:8,maxWidth:260,margin:'0 auto'}}>
+              <button onClick={()=>startQuiz(quiz.lv)} style={{...mk.btn(T,{width:'100%',justifyContent:'center'})}}><Icons.refresh/> Retry Quiz</button>
+              <button onClick={()=>setQuiz(null)} style={{...mk.btn(T,'secondary',{width:'100%',justifyContent:'center'})}}><Icons.target/> All Quizzes</button>
+              <button onClick={()=>{setQuiz(null);const lv=fullCurriculum.find(l=>l.level===quiz.lv);setSelLevel(lv);goView('learn',true);}} style={{...mk.btn(T,'secondary',{width:'100%',justifyContent:'center',fontSize:12})}}><Icons.book/> Go to {quiz.lv} chapters</button>
             </div>
           </div>
         );
@@ -3851,6 +4267,7 @@ window.__App = function MagyarDiak() {
         </div>
         {practiceTab==='srs'       && <SrsView/>}
         {practiceTab==='quiz'      && <QuizView/>}
+        {practiceTab==='placement' && <PlacementTestView/>}
         {practiceTab==='verbs'     && <VerbDrillView/>}
         {practiceTab==='sentences' && <SentenceBuilderView/>}
       </div>
@@ -4273,7 +4690,7 @@ window.__App = function MagyarDiak() {
                           <div style={{display:'flex',alignItems:'flex-start',gap:10}}>
                             <div style={{flex:1,minWidth:0}}>
                               <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
-                                <span style={{fontWeight:700,color:T.accent,fontFamily:'Georgia,serif',fontSize:15,flex:1,minWidth:0}}>{s.hu}</span>
+                                <span style={{fontWeight:700,color:T.accent,fontFamily:'Georgia,serif',fontSize:TS?.ex||15,flex:1,minWidth:0}}>{s.hu}</span>
                                 <SpeakBtn text={s.hu} T={T}/>
                               </div>
                               <div style={{fontSize:13,color:T.textSub,marginBottom:s.notes||s.tags?6:0}}>{s.en}</div>
@@ -4524,12 +4941,13 @@ window.__App = function MagyarDiak() {
             <div style={{fontSize:12,color:T.muted,marginTop:2}}>Magyar Diák · A1–C2</div>
           </div>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:8}}>
           {[
             {icon:<Icons.flame/>,v:`${profile.streak}d`,l:'Streak'},
             {icon:<Icons.zap/>,  v:profile.xp,           l:'XP'},
             {icon:<Icons.book/>, v:profile.done.length,   l:'Done'},
             {icon:<Icons.brain/>,v:dueSrsCards.length,    l:'Due'},
+            {icon:'🛡️',           v:profile.streakFreezes||0, l:'Freezes'},
           ].map(({icon,v,l}) => (
             <div key={l} style={{textAlign:'center',padding:'10px 6px',background:T.surfaceAlt,borderRadius:8}}>
               <div style={{color:T.accent,display:'flex',justifyContent:'center',marginBottom:4}}>{icon}</div>
@@ -4540,6 +4958,50 @@ window.__App = function MagyarDiak() {
         </div>
       </div>
 
+      <div style={{...mk.label(T,{marginBottom:8})}}>Study Statistics</div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:16}}>
+        {[
+          {l:'Total XP',        v:profile.xp,                              c:T.accent},
+          {l:'Chapters done',   v:`${profile.done.length}/${totalCh}`,     c:T.success},
+          {l:'SRS cards',       v:Object.keys(mergedSrsCards).length,       c:T.textSub},
+          {l:'SRS learned',     v:Object.values(mergedSrsCards).filter(c=>c.repetitions>0).length, c:T.textSub},
+          {l:'Day streak',      v:`${profile.streak}d`,                    c:'#f59e0b'},
+          {l:'Streak freezes',  v:profile.streakFreezes||0,                 c:'#8b5cf6'},
+        ].map(({l,v,c})=>(
+          <div key={l} style={{...mk.card(T,{padding:'12px 14px'})}}>
+            <div style={{fontSize:20,fontWeight:700,color:c,marginBottom:2}}>{v}</div>
+            <div style={{fontSize:11,color:T.muted}}>{l}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{...mk.label(T,{marginBottom:8})}}>SRS Forecast (next 7 days)</div>
+      <div style={{...mk.card(T,{padding:'12px 14px',marginBottom:16})}}>
+        {(() => {
+          const today = new Date(); today.setHours(0,0,0,0);
+          const forecast = Array.from({length:7},(_,i)=>{
+            const d = new Date(today); d.setDate(d.getDate()+i);
+            const ts = d.getTime();
+            const count = Object.values(mergedSrsCards).filter(c=>{
+              if(!c.nextReview) return i===0;
+              const nr = new Date(c.nextReview); nr.setHours(0,0,0,0);
+              return nr.getTime()===ts;
+            }).length;
+            return {day:i===0?'Today':i===1?'Tmrw':d.toLocaleDateString('en',{weekday:'short'}), count};
+          });
+          const max = Math.max(...forecast.map(f=>f.count), 1);
+          return (
+            <div style={{display:'flex',gap:4,alignItems:'flex-end',height:60}}>
+              {forecast.map((f,i)=>(
+                <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3}}>
+                  <div style={{fontSize:10,color:T.muted,fontWeight:i===0?700:400}}>{f.count||''}</div>
+                  <div style={{width:'100%',background:i===0?T.accent:T.accentSoft,borderRadius:3,minHeight:3,height:`${Math.max(3,(f.count/max)*44)}px`,transition:'height .3s'}}/>
+                  <div style={{fontSize:9,color:i===0?T.accent:T.muted,fontWeight:i===0?700:400}}>{f.day}</div>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+      </div>
       <div style={{...mk.label(T,{marginBottom:8})}}>Quiz Performance</div>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(110px,1fr))',gap:8,marginBottom:14}}>
         {fullCurriculum.map(lv => {
@@ -4745,7 +5207,23 @@ window.__App = function MagyarDiak() {
               ))}
             </div>
           </div>
-          <div style={{display:'flex',alignItems:'center',gap:14,padding:'12px 16px'}}
+          <div style={{padding:'12px 16px',borderBottom:`1px solid ${T.border}`}}>
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
+              <span style={{color:T.muted,fontSize:14,fontWeight:700}}>Aa</span>
+              <span style={{fontSize:14,fontWeight:500,color:T.text,flex:1}}>Text Size</span>
+              <span style={{fontSize:12,color:T.muted}}>{{sm:'Small',md:'Medium',lg:'Large'}[textSize]}</span>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6}}>
+              {[['sm','Small',13],['md','Medium',15],['lg','Large',18]].map(([k,lbl,sz])=>(
+                <button key={k} onClick={()=>{HAPTIC.tick();setTextSize(k);}}
+                  style={{padding:'8px 4px',borderRadius:8,border:`2px solid ${textSize===k?T.accent:T.border}`,background:textSize===k?T.accentSoft:T.surfaceAlt,cursor:'pointer',fontFamily:'inherit',textAlign:'center'}}>
+                  <div style={{fontSize:sz,fontWeight:700,color:textSize===k?T.accent:T.muted,lineHeight:1.2}}>A</div>
+                  <div style={{fontSize:10,color:textSize===k?T.accent:T.muted,marginTop:2}}>{lbl}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:14,padding:'12px 16px',borderBottom:`1px solid ${T.border}`}}
             onClick={() => { HAPTIC.tick(); setHapticEnabled(h=>!h); }}>
             <span style={{color:T.muted,display:'flex',flexShrink:0}}>{hapticEnabled?<Icons.volume/>:<Icons.volumeX/>}</span>
             <div style={{flex:1}}>
@@ -4753,6 +5231,28 @@ window.__App = function MagyarDiak() {
               <div style={{fontSize:11,color:T.muted,marginTop:1}}>Touch & audio feedback</div>
             </div>
             <Toggle value={hapticEnabled} onChange={setHapticEnabled}/>
+          </div>
+          <div style={{padding:'12px 16px'}}>
+            <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:reminderOn?10:0}} onClick={()=>{
+              HAPTIC.tick();
+              if(!reminderOn && 'Notification' in window) {
+                Notification.requestPermission().then(p => { if(p==='granted'){ setReminderOn(true); } else { setReminderOn(false); } });
+              } else { setReminderOn(r=>!r); }
+            }}>
+              <span style={{color:T.muted,display:'flex',flexShrink:0}}>🔔</span>
+              <div style={{flex:1}}>
+                <div style={{fontSize:14,fontWeight:500,color:T.text}}>Daily Reminder</div>
+                <div style={{fontSize:11,color:T.muted,marginTop:1}}>{reminderOn?`Reminder set for ${reminderTime}`:'Get a daily nudge to practice'}</div>
+              </div>
+              <Toggle value={reminderOn} onChange={v=>{ if(v && 'Notification' in window){ Notification.requestPermission().then(p=>setReminderOn(p==='granted')); } else setReminderOn(v); }}/>
+            </div>
+            {reminderOn && (
+              <div style={{display:'flex',alignItems:'center',gap:10}}>
+                <span style={{fontSize:12,color:T.muted}}>Time:</span>
+                <input type="time" value={reminderTime} onChange={e=>setReminderTime(e.target.value)}
+                  style={{...mk.inp(T,{padding:'6px 10px',fontSize:13,flex:1})}}/>
+              </div>
+            )}
           </div>
         </div>
 
@@ -4873,6 +5373,8 @@ window.__App = function MagyarDiak() {
       `}</style>
 
       <NotifToast/>
+      <InstallBanner/>
+      <ChapDoneModal/>
       <Onboarding/>
       <SearchOverlay/>
 
@@ -4920,10 +5422,8 @@ window.__App = function MagyarDiak() {
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(window.__App));
 </script>
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 </script>
 </body>
